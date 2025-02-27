@@ -309,6 +309,8 @@ func (s *UploadTestSuite) TestResumeUpload() {
 	err = uploader.Upload()
 	s.Nil(err)
 
+	time.Sleep(250 * time.Millisecond)
+
 	s.True(uploader.aborted)
 
 	uploader, err = client.ResumeUpload(upload)

@@ -1,4 +1,4 @@
-# go-tus [![Build Status](https://travis-ci.org/eventials/go-tus.svg?branch=master)](https://travis-ci.org/eventials/go-tus) [![Go Report Card](https://goreportcard.com/badge/github.com/eventials/go-tus)](https://goreportcard.com/report/github.com/eventials/go-tus) [![GoDoc](https://godoc.org/github.com/eventials/go-tus?status.svg)](http://godoc.org/github.com/eventials/go-tus)
+# go-tus [![Build Status](https://travis-ci.org/eventials/go-tus.svg?branch=master)](https://travis-ci.org/eventials/go-tus) [![Go Report Card](https://goreportcard.com/badge/github.com/sky8the2flies/go-tus)](https://goreportcard.com/report/github.com/sky8the2flies/go-tus) [![GoDoc](https://godoc.org/github.com/sky8the2flies/go-tus?status.svg)](http://godoc.org/github.com/sky8the2flies/go-tus)
 
 A pure Go client for the [tus resumable upload protocol](http://tus.io/)
 
@@ -9,7 +9,7 @@ package main
 
 import (
     "os"
-    "github.com/eventials/go-tus"
+    "github.com/sky8the2flies/go-tus"
 )
 
 func main() {
