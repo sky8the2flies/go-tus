@@ -144,7 +144,7 @@ func (c *Client) ResumeUpload(u *Upload) (*Uploader, error) {
 		return nil, ErrUploadNotFound
 	}
 
-	offset, err := c.GetUploadOffset(url)
+	offset, _, err := c.GetUploadData(url)
 
 	if err != nil {
 		return nil, err
@@ -218,36 +218,40 @@ func (c *Client) uploadChunk(url string, body io.Reader, size int64, offset int6
 	}
 }
 
-func (c *Client) GetUploadOffset(url string) (int64, error) {
+func (c *Client) GetUploadData(url string) (int64, int64, error) {
 	req, err := http.NewRequest("HEAD", url, nil)
 
 	if err != nil {
-		return -1, err
+		return -1, -1, err
 	}
 
 	res, err := c.Do(req)
 
 	if err != nil {
-		return -1, err
+		return -1, -1, err
 	}
 	defer res.Body.Close()
 
 	switch res.StatusCode {
 	case 200:
-		i, err := strconv.ParseInt(res.Header.Get("Upload-Offset"), 10, 64)
-
-		if err == nil {
-			return i, nil
-		} else {
-			return -1, err
+		uo, err := strconv.ParseInt(res.Header.Get("Upload-Offset"), 10, 64)
+		if err != nil {
+			return -1, -1, err
 		}
+
+		ul, err := strconv.ParseInt(res.Header.Get("Upload-Length"), 10, 64)
+		if err != nil {
+			return -1, -1, err
+		}
+
+		return uo, ul, nil
 	case 403, 404, 410:
 		// file doesn't exists.
-		return -1, ErrUploadNotFound
+		return -1, -1, ErrUploadNotFound
 	case 412:
-		return -1, ErrVersionMismatch
+		return -1, -1, ErrVersionMismatch
 	default:
-		return -1, newClientError(res)
+		return -1, -1, newClientError(res)
 	}
 }
 
