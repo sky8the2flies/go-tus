@@ -1,6 +1,6 @@
 module github.com/sky8the2flies/go-tus
 
-go 1.22
+go 1.22.0
 
 require (
 	github.com/stretchr/testify v1.5.1
