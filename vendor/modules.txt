@@ -37,4 +37,4 @@ github.com/tus/tusd/pkg/handler
 # gopkg.in/yaml.v2 v2.2.2
 ## explicit
 gopkg.in/yaml.v2
-# github.com/eventials/go-tus => ../go-tus
+# github.com/eventials/go-tus => ./go-tus
