@@ -144,7 +144,7 @@ func (c *Client) ResumeUpload(u *Upload) (*Uploader, error) {
 		return nil, ErrUploadNotFound
 	}
 
-	offset, err := c.getUploadOffset(url)
+	offset, err := c.GetUploadOffset(url)
 
 	if err != nil {
 		return nil, err
@@ -218,7 +218,7 @@ func (c *Client) uploadChunk(url string, body io.Reader, size int64, offset int6
 	}
 }
 
-func (c *Client) getUploadOffset(url string) (int64, error) {
+func (c *Client) GetUploadOffset(url string) (int64, error) {
 	req, err := http.NewRequest("HEAD", url, nil)
 
 	if err != nil {
