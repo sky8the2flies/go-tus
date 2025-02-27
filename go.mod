@@ -1,5 +1,7 @@
 module github.com/sky8the2flies/go-tus
 
+replace github.com/eventials/go-tus => ../go-tus
+
 go 1.23
 
 require (
