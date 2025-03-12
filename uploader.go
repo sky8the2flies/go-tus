@@ -9,6 +9,7 @@ type Uploader struct {
 	url        string
 	upload     *Upload
 	offset     int64
+	curoffset  int64
 	aborted    bool
 	uploadSubs []chan Upload
 	notifyChan chan bool
@@ -96,7 +97,7 @@ func (u *Uploader) broadcastProgress() {
 }
 
 // NewUploader creates a new Uploader.
-func NewUploader(client *Client, url string, upload *Upload, offset int64) *Uploader {
+func NewUploader(client *Client, url string, upload *Upload, offset int64, curoffset int64) *Uploader {
 	notifyChan := make(chan bool)
 
 	uploader := &Uploader{
@@ -104,6 +105,7 @@ func NewUploader(client *Client, url string, upload *Upload, offset int64) *Uplo
 		url,
 		upload,
 		offset,
+		curoffset,
 		false,
 		nil,
 		notifyChan,

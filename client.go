@@ -102,7 +102,7 @@ func (c *Client) CreateUpload(u *Upload) (*Uploader, error) {
 			c.Config.Store.Set(u.Fingerprint, newURL.String())
 		}
 
-		return NewUploader(c, newURL.String(), u, 0), nil
+		return NewUploader(c, newURL.String(), u, 0, 0), nil
 	case 412:
 		return nil, ErrVersionMismatch
 	case 413:
@@ -150,11 +150,11 @@ func (c *Client) ResumeUpload(u *Upload) (*Uploader, error) {
 		return nil, err
 	}
 
-	return NewUploader(c, url, u, offset), nil
+	return NewUploader(c, url, u, offset, offset), nil
 }
 
 // ContinueUpload continues the upload if already created, otherwise it will return an error.
-func (c *Client) ContinueUpload(u *Upload, o int64) (*Uploader, error) {
+func (c *Client) ContinueUpload(u *Upload) (*Uploader, error) {
 	if u == nil {
 		return nil, ErrNilUpload
 	}
@@ -171,7 +171,13 @@ func (c *Client) ContinueUpload(u *Upload, o int64) (*Uploader, error) {
 		return nil, ErrUploadNotFound
 	}
 
-	return NewUploader(c, url, u, o), nil
+	offset, err := c.getUploadOffset(url)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return NewUploader(c, url, u, offset, 0), nil
 }
 
 // CreateOrResumeUpload resumes the upload if already created or creates a new upload in the server.
