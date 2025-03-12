@@ -153,6 +153,27 @@ func (c *Client) ResumeUpload(u *Upload) (*Uploader, error) {
 	return NewUploader(c, url, u, offset), nil
 }
 
+// ContinueUpload continues the upload if already created, otherwise it will return an error.
+func (c *Client) ContinueUpload(u *Upload, o int64) (*Uploader, error) {
+	if u == nil {
+		return nil, ErrNilUpload
+	}
+
+	if !c.Config.Resume {
+		return nil, ErrResumeNotEnabled
+	} else if len(u.Fingerprint) == 0 {
+		return nil, ErrFingerprintNotSet
+	}
+
+	url, found := c.Config.Store.Get(u.Fingerprint)
+
+	if !found {
+		return nil, ErrUploadNotFound
+	}
+
+	return NewUploader(c, url, u, o), nil
+}
+
 // CreateOrResumeUpload resumes the upload if already created or creates a new upload in the server.
 func (c *Client) CreateOrResumeUpload(u *Upload) (*Uploader, error) {
 	if u == nil {
