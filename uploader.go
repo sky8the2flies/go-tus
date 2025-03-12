@@ -43,7 +43,7 @@ func (u *Uploader) Offset() int64 {
 
 // Upload uploads the entire body to the server.
 func (u *Uploader) Upload() error {
-	for u.offset < u.upload.size && !u.aborted {
+	for u.curoffset < u.upload.size && !u.aborted {
 		err := u.UploadChunck()
 
 		if err != nil {
@@ -58,7 +58,7 @@ func (u *Uploader) Upload() error {
 func (u *Uploader) UploadChunck() error {
 	data := make([]byte, u.client.Config.ChunkSize)
 
-	_, err := u.upload.stream.Seek(u.offset, 0)
+	_, err := u.upload.stream.Seek(u.curoffset, 0)
 
 	if err != nil {
 		return err
@@ -78,9 +78,9 @@ func (u *Uploader) UploadChunck() error {
 		return err
 	}
 
-	u.offset = newOffset
+	u.curoffset = newOffset
 
-	u.upload.updateProgress(u.offset)
+	u.upload.updateProgress(u.curoffset)
 
 	u.notifyChan <- true
 
