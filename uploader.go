@@ -2,6 +2,7 @@ package tus
 
 import (
 	"bytes"
+	"log"
 )
 
 type Uploader struct {
@@ -76,6 +77,8 @@ func (u *Uploader) UploadChunck() error {
 	if err != nil {
 		return err
 	}
+
+	log.Printf("offset %d, curoffset %d", u.offset, u.curoffset)
 
 	u.upload.updateProgress(u.offset + u.curoffset)
 
