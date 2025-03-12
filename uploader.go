@@ -38,7 +38,7 @@ func (u *Uploader) Url() string {
 
 // Offset returns the current offset uploaded.
 func (u *Uploader) Offset() int64 {
-	return u.offset
+	return u.curoffset
 }
 
 // Upload uploads the entire body to the server.
@@ -72,15 +72,12 @@ func (u *Uploader) UploadChunck() error {
 
 	body := bytes.NewBuffer(data[:size])
 
-	newOffset, err := u.client.uploadChunck(u.url, body, int64(size), u.offset)
-
+	u.curoffset, err = u.client.uploadChunck(u.url, body, int64(size), u.offset+u.curoffset)
 	if err != nil {
 		return err
 	}
 
-	u.curoffset = newOffset
-
-	u.upload.updateProgress(u.curoffset)
+	u.upload.updateProgress(u.offset + u.curoffset)
 
 	u.notifyChan <- true
 
