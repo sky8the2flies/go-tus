@@ -73,12 +73,14 @@ func (u *Uploader) UploadChunck() error {
 
 	body := bytes.NewBuffer(data[:size])
 
+	log.Printf("before: offset %d, curoffset %d", u.offset, u.curoffset)
+
 	u.curoffset, err = u.client.uploadChunck(u.url, body, int64(size), u.offset+u.curoffset)
 	if err != nil {
 		return err
 	}
 
-	log.Printf("offset %d, curoffset %d", u.offset, u.curoffset)
+	log.Printf("after: offset %d, curoffset %d", u.offset, u.curoffset)
 
 	u.upload.updateProgress(u.offset + u.curoffset)
 
