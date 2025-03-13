@@ -84,8 +84,11 @@ func NewUpload(reader io.Reader, size int64, metadata Metadata, fingerprint stri
 	stream, ok := reader.(io.ReadSeeker)
 
 	if !ok {
-		buf := new(bytes.Buffer)
-		buf.ReadFrom(reader)
+		buf := bytes.NewBuffer(nil)
+		_, err := io.Copy(buf, reader)
+		if err != nil {
+			panic(err)
+		}
 		stream = bytes.NewReader(buf.Bytes())
 	}
 

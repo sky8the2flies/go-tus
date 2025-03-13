@@ -51,28 +51,26 @@ func (u *Uploader) Upload() error {
 		}
 	}
 
+	u.upload.stream = nil
+
 	return nil
 }
 
 // UploadChunck uploads a single chunck.
 func (u *Uploader) UploadChunck() error {
-	data := make([]byte, u.client.Config.ChunkSize)
-
+	data := make([]byte, u.offset)
 	_, err := u.upload.stream.Seek(u.curoffset, 0)
-
 	if err != nil {
 		return err
 	}
 
 	size, err := u.upload.stream.Read(data)
-
 	if err != nil {
 		return err
 	}
 
 	body := bytes.NewBuffer(data[:size])
 	defer body.Reset()
-
 	u.curoffset, err = u.client.uploadChunck(u.url, body, int64(size), u.offset)
 	if err != nil {
 		return err
