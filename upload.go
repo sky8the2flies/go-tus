@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/base64"
 	"fmt"
-	"io"
 	"os"
 	"strings"
 )
@@ -12,7 +11,6 @@ import (
 type Metadata map[string]string
 
 type Upload struct {
-	stream io.ReadSeeker
 	size   int64
 	offset int64
 
@@ -70,35 +68,23 @@ func NewUploadFromFile(f *os.File) (*Upload, error) {
 
 	fingerprint := fmt.Sprintf("%s-%d-%s", fi.Name(), fi.Size(), fi.ModTime())
 
-	return NewUpload(f, fi.Size(), metadata, fingerprint), nil
+	return NewUpload(fi.Size(), metadata, fingerprint), nil
 }
 
 // NewUploadFromBytes creates a new upload from a byte array.
 func NewUploadFromBytes(b []byte) *Upload {
 	buffer := bytes.NewReader(b)
-	return NewUpload(buffer, buffer.Size(), nil, "")
+	return NewUpload(buffer.Size(), nil, "")
 }
 
 // NewUpload creates a new upload from an io.Reader.
-func NewUpload(reader io.Reader, size int64, metadata Metadata, fingerprint string) *Upload {
-	stream, ok := reader.(io.ReadSeeker)
-
-	if !ok {
-		buf := bytes.NewBuffer(nil)
-		_, err := io.Copy(buf, reader)
-		if err != nil {
-			panic(err)
-		}
-		stream = bytes.NewReader(buf.Bytes())
-	}
-
+func NewUpload(size int64, metadata Metadata, fingerprint string) *Upload {
 	if metadata == nil {
 		metadata = make(Metadata)
 	}
 
 	return &Upload{
-		stream: stream,
-		size:   size,
+		size: size,
 
 		Fingerprint: fingerprint,
 		Metadata:    metadata,

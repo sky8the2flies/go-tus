@@ -1,6 +1,7 @@
 package tus
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"net/http"
@@ -111,7 +112,7 @@ func (s *UploadTestSuite) TestSmallUploadFromFile() {
 	s.Nil(err)
 	s.NotNil(uploader)
 
-	err = uploader.Upload()
+	err = uploader.Upload(f)
 	s.Nil(err)
 
 	up, err := s.store.GetUpload(ctx, uploadIDFromURL(uploader.url))
@@ -148,7 +149,7 @@ func (s *UploadTestSuite) TestLargeUpload() {
 	s.Nil(err)
 	s.NotNil(uploader)
 
-	err = uploader.Upload()
+	err = uploader.Upload(f)
 	s.Nil(err)
 
 	up, err := s.store.GetUpload(ctx, uploadIDFromURL(uploader.url))
@@ -168,14 +169,16 @@ func (s *UploadTestSuite) TestUploadFromBytes() {
 	client, err := NewClient(s.url, nil)
 	s.Nil(err)
 
-	upload := NewUploadFromBytes([]byte("1234567890"))
+	stream := bytes.NewBuffer([]byte("1234567890"))
+
+	upload := NewUploadFromBytes(stream.Bytes())
 	s.Nil(err)
 
 	uploader, err := client.CreateUpload(upload)
 	s.Nil(err)
 	s.NotNil(uploader)
 
-	err = uploader.Upload()
+	err = uploader.Upload(stream)
 	s.Nil(err)
 
 	up, err := s.store.GetUpload(ctx, uploadIDFromURL(uploader.url))
@@ -197,14 +200,15 @@ func (s *UploadTestSuite) TestOverridePatchMethod() {
 
 	client.Config.OverridePatchMethod = true
 
-	upload := NewUploadFromBytes([]byte("1234567890"))
+	stream := bytes.NewBuffer([]byte("1234567890"))
+	upload := NewUploadFromBytes(stream.Bytes())
 	s.Nil(err)
 
 	uploader, err := client.CreateUpload(upload)
 	s.Nil(err)
 	s.NotNil(uploader)
 
-	err = uploader.Upload()
+	err = uploader.Upload(stream)
 	s.Nil(err)
 
 	up, err := s.store.GetUpload(ctx, uploadIDFromURL(uploader.url))
@@ -249,7 +253,7 @@ func (s *UploadTestSuite) TestConcurrentUploads() {
 			s.Nil(err)
 			s.NotNil(uploader)
 
-			err = uploader.Upload()
+			err = uploader.Upload(f)
 			s.Nil(err)
 
 			up, err := s.store.GetUpload(ctx, uploadIDFromURL(uploader.url))
@@ -306,7 +310,7 @@ func (s *UploadTestSuite) TestResumeUpload() {
 		uploader.Abort()
 	}()
 
-	err = uploader.Upload()
+	err = uploader.Upload(f)
 	s.Nil(err)
 
 	s.True(uploader.aborted)
@@ -315,7 +319,7 @@ func (s *UploadTestSuite) TestResumeUpload() {
 	s.Nil(err)
 	s.NotNil(uploader)
 
-	err = uploader.Upload()
+	err = uploader.Upload(f)
 	s.Nil(err)
 
 	up, err := s.store.GetUpload(ctx, uploadIDFromURL(uploader.url))

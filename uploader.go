@@ -2,6 +2,7 @@ package tus
 
 import (
 	"bytes"
+	"io"
 )
 
 type Uploader struct {
@@ -42,29 +43,28 @@ func (u *Uploader) Offset() int64 {
 }
 
 // Upload uploads the entire body to the server.
-func (u *Uploader) Upload() error {
+func (u *Uploader) Upload(stream io.Reader) error {
 	for u.curoffset < u.upload.size && !u.aborted {
-		err := u.UploadChunck()
-
+		err := u.UploadChunck(stream)
 		if err != nil {
 			return err
 		}
 	}
 
-	u.upload.stream = nil
-
 	return nil
 }
 
 // UploadChunck uploads a single chunck.
-func (u *Uploader) UploadChunck() error {
-	data := make([]byte, u.offset)
-	_, err := u.upload.stream.Seek(u.curoffset, 0)
-	if err != nil {
-		return err
+func (u *Uploader) UploadChunck(stream io.Reader) error {
+	ts := u.upload.size
+
+	if u.client != nil && u.client.Config.ChunkSize < ts {
+		ts = u.client.Config.ChunkSize
 	}
 
-	size, err := u.upload.stream.Read(data)
+	data := make([]byte, ts)
+
+	size, err := stream.Read(data)
 	if err != nil {
 		return err
 	}
