@@ -77,6 +77,8 @@ func (u *Uploader) UploadChunck() error {
 		return err
 	}
 
+	u.curoffset -= u.offset
+
 	u.upload.updateProgress(u.curoffset)
 
 	u.notifyChan <- true
