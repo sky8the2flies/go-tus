@@ -71,6 +71,7 @@ func (u *Uploader) UploadChunck() error {
 	}
 
 	body := bytes.NewBuffer(data[:size])
+	defer body.Reset()
 
 	u.curoffset, err = u.client.uploadChunck(u.url, body, int64(size), u.offset)
 	if err != nil {
@@ -82,6 +83,8 @@ func (u *Uploader) UploadChunck() error {
 	u.upload.updateProgress(u.curoffset)
 
 	u.notifyChan <- true
+
+	data = nil
 
 	return nil
 }
